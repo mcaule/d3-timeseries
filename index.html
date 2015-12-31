@@ -8,6 +8,17 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+
+    <script src="bower_components/d3/d3.min.js"></script>
+    <script src="src/d3_timeseries.js"></script>
+    <link href="src/d3_timeseries.css" rel="stylesheet" type="text/css"></link>
+    <style>
+    .gist{font-size:12px;line-height:16px;margin-bottom:0px;width:900px}
+    .gist-meta{display:none;}
+    td{
+      border:none !important;
+    }
+    </style>
   </head>
   <body>
     <section class="page-header">
@@ -24,6 +35,37 @@
 
 <p>Time series charting library based on d3.js</p>
 
+<h2>Examples</h2>
+
+<h3>Difference</h3>
+<div class="chartContainer">
+  <div class="chart" id='chart3'></div>
+</div>
+<h4>Implementation : </h4>
+<script src="https://gist.github.com/mcaule/bf62f7b76065ad291d56.js"></script>
+
+<h3>Confidence Interval</h3>
+<div class="chartContainer">
+  <div class="chart" id='chart2'></div>
+</div>
+<h4>Implementation : </h4>
+<script src="https://gist.github.com/mcaule/f36b2ede268b597be62c.js"></script>
+
+
+<h3>NaN Values</h3>
+<div class="chartContainer">
+  <div class="chart" id='chart4'></div>
+</div>
+<h4>Implementation : </h4>
+<script src="https://gist.github.com/mcaule/690c5c0d0c17c830b5ab.js"></script>
+
+<h3>Simple timeserie with french locale</h3>
+<div class="chartContainer">
+  <div class="chart" id='chart1'></div>
+</div>
+<h4>Implementation : </h4>
+<script src="https://gist.github.com/mcaule/ed7c1a7120ce95ab273e.js"></script>
+
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/mcaule/d3-timeseries">D3-timeseries</a> is maintained by <a href="https://github.com/mcaule">mcaule</a>.</span>
 
@@ -32,6 +74,116 @@
 
     </section>
 
-  
+    <script>
+
+    var french_locale = d3.locale({
+        "decimal": ",",
+        "thousands": " ",
+        "grouping": [3],
+        "currency": ["€", ""],
+        "dateTime": "%a %e %b %Y %X",
+        "date": "%d-%m-%Y",
+        "time": "%Hh%M",
+        "periods": ["am", "pm"],
+        "days": ["Dimanche","Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+        "shortDays": ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"],
+        "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aôut", "Septembre", "Octobre", "Novembre", "Décembre"],
+        "shortMonths": ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aôut", "Sep", "Oct", "Nov", "Déc"]
+    })
+    var french_timeformat = french_locale.timeFormat.multi([
+      ["%Hh", function(d) { return d.getHours(); }],
+      ["%d/%m", function(d) { return d.getDate()!=1}],
+      //["%d", function(d) { return d.getDate() != 1; }],
+      ["%B", function(d) { return d.getMonth(); }],
+      ["%Y", function() { return true; }]
+    ]);
+
+    //data :
+    // [{date:new Date('2013-01-01'),n:120,n2:200}]
+    var chart = d3.timeseries()
+              .addSerie(createRandomData(1000,[1000,1000000]),{x:'date',y:'n'},{interpolate:'step-before'})
+              .addSerie(null,{x:'date',y:'n2'},
+              {interpolate:'linear'})
+              .xscale.tickFormat(french_timeformat)
+              .width(900)
+              .yscale.tickFormat(french_locale.numberFormat(",f"))
+              .margin.left(70)
+    //french_locale is a d3 js locale:
+    // https://github.com/mbostock/d3/wiki/Localization#locale
+    //french_timeformat is a d3 js multi time format
+    // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
+    chart('#chart1')
+
+    var data = createRandomData(80,[0,1000],0.01)
+    var chart2 = d3.timeseries()
+              .addSerie(data.slice(0,60),{x:'date',y:'n'},{interpolate:'linear',color:"#a6cee3",label:"value"})
+              .addSerie(data.slice(50),
+                  {x:'date',y:'n3',ci_up:'ci_up',ci_down:'ci_down'},
+                  {interpolate:'monotone',dashed:true,color:"#a6cee3",label:"prediction"})
+              .width(900)
+
+    chart2('#chart2')
+
+
+    var chart3 = d3.timeseries()
+              .addSerie(data,{x:'date',y:'n',diff:'n3'},{interpolate:'monotone',color:"#333"})
+              .width(900)
+
+    chart3('#chart3')
+
+    var data = createRandomData(80,[500,1000],0.01)
+    data[20].n  = Number.NaN
+    data[40].n  = Number.NaN
+
+    data[42].n  = Number.NaN
+    data[60].n  = Number.NaN
+    data[61].n  = Number.NaN
+    data[62].n  = Number.NaN
+
+    var chart4 = d3.timeseries()
+              .addSerie(data,{x:'date',y:'n'},{interpolate:'monotone',width:3})
+              .yscale.domain([0]) // show 0 on y axis
+              .margin.left(40)
+              .width(900)
+
+    chart4('#chart4')
+
+    function createRandomData(n,range,rand)
+    {
+    if(range==null)
+    range=[0,100]
+    if(rand==null)
+    rand=1/20
+
+    var num = range[0] + Math.floor(Math.random()*(range[1]-range[0]))
+    var num2 = range[0] + Math.floor(Math.random()*(range[1]-range[0]))
+    var num3 = num
+    var d= new Date('2013-01-01')
+    var data = []
+    var rgen = d3.random.normal(0,(range[1]-range[0])*rand)
+    for (var i = 0; i<n; i++)
+    {
+
+    data.push({date:d,n:num,n2:num2,n3:num3,
+            ci_up:num3*1.05,ci_down:num3*0.95
+    })
+    d = new Date(d.getTime() + 1000*60*60*24)
+    num = num+rgen()
+    num3 = num+rgen()/3
+    num = Math.min(Math.max(num,range[0]),range[1])
+    num2 = num2+rgen()
+    num2 = Math.min(Math.max(num2,range[0]),range[1])
+
+
+
+    }
+    return data;
+    }
+
+
+
+    </script>
+
+
   </body>
 </html>
