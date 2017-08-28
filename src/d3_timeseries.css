@@ -12,10 +12,10 @@
 }
 
 
-.d3_timeseries.brush {
+/*.d3_timeseries.brush {
   fill-opacity : 0.2;
   fill:#666;
-}
+}*/
 
 .d3_timeseries.mousevline {
   fill:none;

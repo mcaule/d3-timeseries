@@ -9,9 +9,9 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
 
-    <script src="bower_components/d3/d3.min.js"></script>
-    <script src="src/d3_timeseries.js"></script>
-    <link href="src/d3_timeseries.css" rel="stylesheet" type="text/css"></link>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.min.js"></script>
+    <script src="dist/d3_timeseries.min.js"></script>
+    <link href="dist/d3_timeseries.min.css" rel="stylesheet" type="text/css"></link>
     <style>
     .gist{font-size:12px;line-height:16px;margin-bottom:0px;width:900px}
     .gist-meta{display:none;}
@@ -76,7 +76,7 @@
 
     <script>
 
-    var french_locale = d3.locale({
+    var french_locale = d3.formatDefaultLocale({
         "decimal": ",",
         "thousands": " ",
         "grouping": [3],
@@ -90,23 +90,22 @@
         "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aôut", "Septembre", "Octobre", "Novembre", "Décembre"],
         "shortMonths": ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aôut", "Sep", "Oct", "Nov", "Déc"]
     })
-    var french_timeformat = french_locale.timeFormat.multi([
-      ["%Hh", function(d) { return d.getHours(); }],
-      ["%d/%m", function(d) { return d.getDate()!=1}],
-      //["%d", function(d) { return d.getDate() != 1; }],
-      ["%B", function(d) { return d.getMonth(); }],
-      ["%Y", function() { return true; }]
-    ]);
+    var french_timeformat = function(d) {
+      return ( d.getHours() ? d3.timeFormat("%Hh")
+          : d.getDate()!=1 ? d3.timeFormat("%d/%m")
+          : d.getMonth() ? d3.timeFormat("%B")
+          : d3.timeFormat("%Y") )
+    }
 
     //data :
     // [{date:new Date('2013-01-01'),n:120,n2:200}]
-    var chart = d3.timeseries()
+    var chart = d3_timeseries()
               .addSerie(createRandomData(1000,[1000,1000000]),{x:'date',y:'n'},{interpolate:'step-before'})
               .addSerie(null,{x:'date',y:'n2'},
               {interpolate:'linear'})
               .xscale.tickFormat(french_timeformat)
               .width(900)
-              .yscale.tickFormat(french_locale.numberFormat(",f"))
+              .yscale.tickFormat(french_locale.format(",f"))
               .margin.left(70)
     //french_locale is a d3 js locale:
     // https://github.com/mbostock/d3/wiki/Localization#locale
@@ -115,7 +114,7 @@
     chart('#chart1')
 
     var data = createRandomData(80,[0,1000],0.01)
-    var chart2 = d3.timeseries()
+    var chart2 = d3_timeseries()
               .addSerie(data.slice(0,60),{x:'date',y:'n'},{interpolate:'linear',color:"#a6cee3",label:"value"})
               .addSerie(data.slice(50),
                   {x:'date',y:'n3',ci_up:'ci_up',ci_down:'ci_down'},
@@ -125,7 +124,7 @@
     chart2('#chart2')
 
 
-    var chart3 = d3.timeseries()
+    var chart3 = d3_timeseries()
               .addSerie(data,{x:'date',y:'n',diff:'n3'},{interpolate:'monotone',color:"#333"})
               .width(900)
 
@@ -140,7 +139,7 @@
     data[61].n  = Number.NaN
     data[62].n  = Number.NaN
 
-    var chart4 = d3.timeseries()
+    var chart4 = d3_timeseries()
               .addSerie(data,{x:'date',y:'n'},{interpolate:'monotone',width:3})
               .yscale.domain([0]) // show 0 on y axis
               .margin.left(40)
@@ -150,29 +149,29 @@
 
     function createRandomData(n,range,rand)
     {
-    if(range==null)
-    range=[0,100]
-    if(rand==null)
-    rand=1/20
+      if(range==null)
+        range=[0,100]
+      if(rand==null)
+        rand=1/20
 
-    var num = range[0] + Math.floor(Math.random()*(range[1]-range[0]))
-    var num2 = range[0] + Math.floor(Math.random()*(range[1]-range[0]))
-    var num3 = num
-    var d= new Date('2013-01-01')
-    var data = []
-    var rgen = d3.random.normal(0,(range[1]-range[0])*rand)
-    for (var i = 0; i<n; i++)
-    {
+      var num = range[0] + Math.floor(Math.random()*(range[1]-range[0]))
+      var num2 = range[0] + Math.floor(Math.random()*(range[1]-range[0]))
+      var num3 = num
+      var d= new Date('2013-01-01')
+      var data = []
+      var rgen = d3.randomNormal(0,(range[1]-range[0])*rand)
+      for (var i = 0; i<n; i++)
+      {
 
-    data.push({date:d,n:num,n2:num2,n3:num3,
-            ci_up:num3*1.05,ci_down:num3*0.95
-    })
-    d = new Date(d.getTime() + 1000*60*60*24)
-    num = num+rgen()
-    num3 = num+rgen()/3
-    num = Math.min(Math.max(num,range[0]),range[1])
-    num2 = num2+rgen()
-    num2 = Math.min(Math.max(num2,range[0]),range[1])
+        data.push({date:d,n:num,n2:num2,n3:num3,
+                ci_up:num3*1.05,ci_down:num3*0.95
+      })
+      d = new Date(d.getTime() + 1000*60*60*24)
+      num = num+rgen()
+      num3 = num+rgen()/3
+      num = Math.min(Math.max(num,range[0]),range[1])
+      num2 = num2+rgen()
+      num2 = Math.min(Math.max(num2,range[0]),range[1])
 
 
 
