@@ -1,19 +1,10 @@
-(function (factory) {
-  if (typeof define === "function"  && define.amd)  {
-    define(['d3', 'd3-tip'], factory);
-  } else {
-    if (d3 && d3.tip) {
-      d3.timeseries = factory(d3, d3.tip);
-    } else {
-      d3.timeseries = factory(d3);
-    }
-  }
-}(
-function (d3, d3tip) {
+import * as d3 from "d3";
+
+export default function () {
   var defaultColors = ["#a6cee3", "#ff7f00", "#b2df8a", "#1f78b4", "#fdbf6f", "#33a02c", "#cab2d6", "#6a3d9a", "#fb9a99", "#e31a1c", "#ffff99", "#b15928"];
 
   var timeseries = function ()  {
-  // default
+    // default
     var height = 480;
     var width = 600;
 
@@ -23,12 +14,12 @@ function (d3, d3tip) {
 
     var series = [];
 
-    var yscale = d3.scale.linear();
-    var xscale = d3.time.scale();
+    var yscale = d3.scaleLinear();
+    var xscale = d3.scaleTime();
     yscale.label = "";
     xscale.label = "";
 
-    var brush = d3.svg.brush();
+    var brush = d3.brush();
 
     var svg, container, serieContainer, annotationsContainer, drawerContainer, mousevline;
     var fullxscale, tooltipDiv;
@@ -58,7 +49,7 @@ function (d3, d3tip) {
         serie.options.interpolate = 'linear';
       }
 
-      var line = d3.svg.line()
+      var line = d3.line()
                   .x(functorkeyscale(aes.x, xscale))
                   .y(functorkeyscale(aes.y, yscale))
                   .interpolate(serie.options.interpolate)
@@ -72,7 +63,7 @@ function (d3, d3tip) {
                             serie.aes.y;
 
       if (aes.ci_up && aes.ci_down) {
-        var ciArea = d3.svg.area()
+        var ciArea = d3.area()
                         .x(functorkeyscale(aes.x, xscale))
                         .y0(functorkeyscale(aes.ci_down, yscale))
                         .y1(functorkeyscale(aes.ci_up, yscale))
@@ -81,7 +72,7 @@ function (d3, d3tip) {
       }
 
       if (aes.diff) {
-        serie.diffAreas = [d3.svg.area()
+        serie.diffAreas = [d3.area()
                                 .x(functorkeyscale(aes.x, xscale))
                                 .y0(functorkeyscale(aes.y, yscale))
                                 .y1(function (d) {
@@ -91,7 +82,7 @@ function (d3, d3tip) {
                                 })
                                 .interpolate(serie.options.interpolate)
                                 ,
-                           d3.svg.area()
+                           d3.area()
                                 .x(functorkeyscale(aes.x, xscale))
                                 .y1(functorkeyscale(aes.y, yscale))
                                 .y0(function (d) {
@@ -238,7 +229,7 @@ function (d3, d3tip) {
       var smallyscale = yscale.copy()
                 .range([drawerHeight - drawerTopMargin, 0]);
       var serie = series[0];
-      var line = d3.svg.line()
+      var line = d3.line()
                 .x(functorkeyscale(serie.aes.x, fullxscale))
                 .y(functorkeyscale(serie.aes.y, smallyscale))
                 .interpolate(serie.options.interpolate)
@@ -365,8 +356,8 @@ function (d3, d3tip) {
       };
       mousevline.update();
 
-      var xAxis = d3.svg.axis().scale(xscale).orient('bottom').tickFormat(xscale.setformat);
-      var yAxis = d3.svg.axis().scale(yscale).orient('left').tickFormat(yscale.setformat);
+      var xAxis = d3.axisBottom().scale(xscale).tickFormat(xscale.setformat);
+      var yAxis = d3.axisLeft().scale(yscale).tickFormat(yscale.setformat);
 
       brush.x(fullxscale)
           .on('brush', function () {
@@ -525,5 +516,3 @@ function (d3, d3tip) {
 
   return timeseries;
 }
-
-));
