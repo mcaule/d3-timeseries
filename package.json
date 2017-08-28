@@ -1,0 +1,42 @@
+{
+  "name": "d3-timeseries",
+  "version": "1.0.0",
+  "description": "Timeseries library with d3.js and SVG",
+  "main": "src/d3_timeseries.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c",
+    "uglifycss": "uglifycss src/d3_timeseries.css > dist/d3_timeseries.min.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcaule/d3-timeseries.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mcaule/d3-timeseries/issues"
+  },
+  "homepage": "https://github.com/mcaule/d3-timeseries#readme",
+  "keywords": [
+    "d3",
+    "timeseries"
+  ],
+  "author": "m.caule",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-latest": "^6.24.1",
+    "jasmine-core": "^2.7.0",
+    "karma": "^1.7.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^1.1.0",
+    "karma-rollup-preprocessor": "^4.0.2",
+    "rollup": "^0.45.2",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-uglify": "^2.0.1",
+    "uglifycss": "0.0.27"
+  },
+  "dependencies": {
+    "d3": "^4.10.0"
+  }
+}
