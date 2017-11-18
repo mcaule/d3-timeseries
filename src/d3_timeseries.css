@@ -11,12 +11,6 @@
   shape-rendering: crispEdges;
 }
 
-
-/*.d3_timeseries.brush {
-  fill-opacity : 0.2;
-  fill:#666;
-}*/
-
 .d3_timeseries.mousevline {
   fill:none;
   stroke: #666;
