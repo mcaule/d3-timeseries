@@ -6,3 +6,9 @@ Time series charting library based on d3.js
 [
 ![screenshot](http://mcaule.github.io/d3-timeseries/img/d3-timeseries_screenshot1.png)
 ](http://mcaule.github.io/d3-timeseries/)
+
+## Installation
+
+```
+npm install d3-timeseries --save
+```

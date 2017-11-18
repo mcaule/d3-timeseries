@@ -1,6 +1,6 @@
 {
   "name": "d3-timeseries",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Timeseries library with d3.js and SVG",
   "main": "src/d3_timeseries.js",
   "scripts": {
@@ -20,7 +20,10 @@
     "d3",
     "timeseries"
   ],
-  "author": "m.caule",
+  "author": {
+    "name":"Matthieu Caule",
+    "email":"matthieu.caule@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "babel-plugin-external-helpers": "^6.22.0",
