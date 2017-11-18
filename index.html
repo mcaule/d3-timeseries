@@ -10,8 +10,8 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.min.js"></script>
-    <script src="dist/d3_timeseries.min.js"></script>
-    <link href="dist/d3_timeseries.min.css" rel="stylesheet" type="text/css"></link>
+    <script src="src/d3_timeseries.min.js"></script>
+    <link href="src/d3_timeseries.css" rel="stylesheet" type="text/css"></link>
     <style>
     .gist{font-size:12px;line-height:16px;margin-bottom:0px;width:900px}
     .gist-meta{display:none;}
@@ -76,11 +76,7 @@
 
     <script>
 
-    var french_locale = d3.formatDefaultLocale({
-        "decimal": ",",
-        "thousands": " ",
-        "grouping": [3],
-        "currency": ["€", ""],
+    var frenchLocale = d3.timeFormatLocale({
         "dateTime": "%a %e %b %Y %X",
         "date": "%d-%m-%Y",
         "time": "%Hh%M",
@@ -90,11 +86,14 @@
         "months": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aôut", "Septembre", "Octobre", "Novembre", "Décembre"],
         "shortMonths": ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aôut", "Sep", "Oct", "Nov", "Déc"]
     })
-    var french_timeformat = function(d) {
-      return ( d.getHours() ? d3.timeFormat("%Hh")
-          : d.getDate()!=1 ? d3.timeFormat("%d/%m")
-          : d.getMonth() ? d3.timeFormat("%B")
-          : d3.timeFormat("%Y") )
+
+    var frenchTimeFormat = function(date){
+      return (
+        d3.timeDay(date) < date ? frenchLocale.format("%Hh") :
+        d3.timeMonth(date) < date ? frenchLocale.format("%d/%m") :
+        d3.timeYear(date) < date ? frenchLocale.format("%B") :
+        d3.timeFormat("%Y")
+      )(date)
     }
 
     //data :
@@ -103,9 +102,8 @@
               .addSerie(createRandomData(1000,[1000,1000000]),{x:'date',y:'n'},{interpolate:'step-before'})
               .addSerie(null,{x:'date',y:'n2'},
               {interpolate:'linear'})
-              .xscale.tickFormat(french_timeformat)
+              .xscale.tickFormat(frenchTimeFormat)
               .width(900)
-              .yscale.tickFormat(french_locale.format(",f"))
               .margin.left(70)
     //french_locale is a d3 js locale:
     // https://github.com/mbostock/d3/wiki/Localization#locale
