@@ -408,6 +408,18 @@ export default function ()  {
         svg.select(".focus.x.axis").call(xAxis);
         mousevline.update();
         updatefocusRing();
+      })
+
+      .on('end', () => {
+        let selection = d3.event.selection;
+        if (selection === null) {
+          xscale.domain(fullxscale.domain());
+
+          series.forEach(drawSerie);
+          svg.select(".focus.x.axis").call(xAxis);
+          mousevline.update();
+          updatefocusRing();
+        }
       });
 
     svg.append('g')
